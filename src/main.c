@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parser.h"
 #include "sheet.h"
 #include "display.h"
 
@@ -78,10 +79,7 @@ int main(int argc, char *argv[])
 
         else
         {
-            print_sheet();
-            printf("[0.0] (unrecognized cmd) >");
-            fflush(stdout);
-            fgets(input, sizeof(input), stdin); //waits for user
+           parse_input(input);
         }
 
     }
