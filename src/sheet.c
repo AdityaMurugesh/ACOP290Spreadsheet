@@ -2,19 +2,22 @@
 #include <stdlib.h>
 #include "sheet.h"
 
-Cell sheet[MAX_ROWS][MAX_COLS];
+Cell **sheet;
 int num_rows, num_cols;
 int view_row = 0, view_col = 0;
 
 void init_sheet(int rows, int cols) {
     num_rows = rows;
     num_cols = cols;
-    for (int i = 0; i < num_rows; i++) {
-        for (int j = 0; j < num_cols; j++) {
+
+    sheet = malloc(rows * sizeof(Cell *));  // allocate array of row pointers
+    for (int i = 0; i < rows; i++) {
+        sheet[i] = malloc(cols * sizeof(Cell));  // allocate each row
+        for (int j = 0; j < cols; j++) {
             sheet[i][j].value = 0;
             sheet[i][j].has_error = 0;
             sheet[i][j].formula[0] = '\0';
-        } //initialize each cell to default values
+        }
     }
 }
 
