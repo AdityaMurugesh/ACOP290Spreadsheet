@@ -43,7 +43,7 @@ int parse_value(char *input, int i, Value *val)
     return -1;
 }
 
-void parse_input(char *input)
+int parse_input(char *input)
 {
 char col_name[4];
 int col_len=0;
@@ -58,8 +58,8 @@ col_name[col_len]='\0';
 
 
 if (col_len==0){
-    printf("invalid input\n");
-    return;
+
+    return 1;
 }
 char row_name[5];
 int row_len = 0;
@@ -74,8 +74,7 @@ row_name[row_len] = '\0';
 
 if (row_len == 0)
 {
-    printf("invalid input\n");
-    return;
+    return 1;
 }
 while (input[i] == ' ')
 {
@@ -84,8 +83,7 @@ while (input[i] == ' ')
 
 if (input[i] != '=')
 {
-    printf("invalid input\n");
-    return;
+    return 1;
 }
 i++;
 
@@ -96,8 +94,8 @@ while (input[i] == ' ')
 
 if (input[i] == '\0')
 {
-    printf("invalid input\n");
-    return;
+
+    return 1;
 }
 Expression expr;
 int save_i = i;
@@ -141,8 +139,8 @@ if (input[i]=='('){
     }
     else
     {
-        printf("invalid function\n");
-        return;
+        
+        return 1;
     }
 
     i++;
@@ -176,8 +174,7 @@ if (input[i]=='('){
         
         if (input[i] != ':')
         {
-            printf("invalid range\n");
-            return;
+            return 1;
         }
         i++;
         char end_col_name[4];
@@ -204,8 +201,7 @@ if (input[i]=='('){
     }
     if (input[i] != ')')
     {
-        printf("invalid function format\n");
-        return;
+        return 1;
     }
     i++;
 
@@ -219,8 +215,7 @@ else
     i = parse_value(input, i, &left);
     if (i == -1)
     {
-        printf("invalid input\n");
-        return;
+        return 1;
     }
     expr.left = left;
 
@@ -248,8 +243,7 @@ else
         i = parse_value(input, i, &right);
         if (i == -1)
         {
-            printf("invalid input\n");
-            return;
+            return 1;
         }
         expr.right = right;
     }
@@ -262,8 +256,7 @@ else
     }
     else
     {
-        printf("invalid input\n");
-        return;
+        return 1;
     }
 }
 
@@ -272,8 +265,7 @@ int row = row_name_to_index(row_name);
 
 if (row < 0 || row >= num_rows || col < 0 || col >= num_cols)
 {
-    printf("invalid cell\n");
-    return;
+    return 1;
 }
 
 if (expr.type == constant)
@@ -285,7 +277,7 @@ if (expr.type == constant)
 strcpy(sheet[row][col].formula, input);
 
 print_sheet();
+return 0;
+
 }
-
-
     

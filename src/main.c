@@ -79,8 +79,16 @@ int main(int argc, char *argv[])
 
         else
         {
-           parse_input(input);
+            int result = parse_input(input);
+            if (result == 1)
+            {
+                print_sheet();
+                printf("[0.0] (unrecognized cmd) >");
+                fflush(stdout);
+                fgets(input, sizeof(input), stdin);
+            }
         }
+
 
     }
 
