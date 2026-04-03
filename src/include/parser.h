@@ -44,6 +44,6 @@ typedef struct {
     int range_end_row, range_end_col;
 } Expression;
 
-void parse_input(char *input);
+int parse_input(char *input);
 
 #endif
