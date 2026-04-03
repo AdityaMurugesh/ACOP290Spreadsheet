@@ -4,6 +4,7 @@
 #include <string.h>
 #include "parser.h"
 #include "display.h"
+#include "evaluator.h"
 
 int parse_value(char *input, int i, Value *val)
 {
@@ -276,13 +277,18 @@ if (row < 0 || row >= num_rows || col < 0 || col >= num_cols)
     return;
 }
 
-if (expr.type == constant)
+int has_error = 0;
+int result = evaluate(&expr, &has_error);
+
+sheet[row][col].has_error = has_error;
+
+if (!has_error)
 {
-    sheet[row][col].value = expr.left.constant;
-    sheet[row][col].has_error = 0;
+    sheet[row][col].value = result;
 }
 
 strcpy(sheet[row][col].formula, input);
+
 
 print_sheet();
 }
