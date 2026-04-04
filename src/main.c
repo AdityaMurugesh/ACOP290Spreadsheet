@@ -5,6 +5,7 @@
 #include "sheet.h"
 #include "display.h"
 #include "evaluator.h"
+#include "graph.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,15 +25,18 @@ int main(int argc, char *argv[])
     }
 
     init_sheet(rows, cols);
+    init_graph(rows, cols);
 
     print_sheet();
 
     char input[256]; //keeps running till user types q
+    char *status = "ok";
 
     while (1)
     {
-        printf("[0.0] (ok) >");
+        printf("[0.0] (%s) > ", status);
         fflush(stdout);
+        status = "ok";
 
         if(fgets(input, sizeof(input), stdin) == NULL)
         {
@@ -83,10 +87,13 @@ int main(int argc, char *argv[])
             int result = parse_input(input);
             if (result == 1)
             {
+                status = "unrecognized cmd";
                 print_sheet();
-                printf("[0.0] (unrecognized cmd) >");
-                fflush(stdout);
-                fgets(input, sizeof(input), stdin);
+            }
+            else if (result == 2)
+            {
+                status = "circular dependency";
+                print_sheet();
             }
         }
 

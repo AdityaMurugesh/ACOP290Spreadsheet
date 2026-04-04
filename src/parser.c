@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "display.h"
 #include "evaluator.h"
+#include "graph.h"
 
 int parse_value(char *input, int i, Value *val)
 {
@@ -269,18 +270,52 @@ if (row < 0 || row >= num_rows || col < 0 || col >= num_cols)
     return 1;
 }
 
+// clear old dependencies
+clear_dependency_graph(row, col);
+
+// add new dependencies
+if (expr.type == cell) {
+    add_dependency(expr.left.row, expr.left.col, row, col);
+} else if (expr.type == arithmetic) {
+    if (expr.left.is_cell)
+        add_dependency(expr.left.row, expr.left.col, row, col);
+    if (expr.right.is_cell)
+        add_dependency(expr.right.row, expr.right.col, row, col);
+} else if (expr.type == func && expr.func != slp) {
+    for (int r = expr.range_start_row; r <= expr.range_end_row; r++) {
+        for (int c = expr.range_start_col; c <= expr.range_end_col; c++) {
+            add_dependency(r, c, row, col);
+        }
+    }
+} else if (expr.type == func && expr.func == slp) {
+    if (expr.left.is_cell)
+        add_dependency(expr.left.row, expr.left.col, row, col);
+}
+
+// check for circular dependency
+if (has_circular_dependency(row, col)) {
+    clear_dependency_graph(row, col);
+    return 2;  // circular dependency error
+}
+
+// store expression in graph
+Expression *stored_expr = malloc(sizeof(Expression));
+*stored_expr = expr;
+graph[row][col].expr = stored_expr;
+graph[row][col].has_formula = (expr.type != constant) ? 1 : 0;
+
+// evaluate expression
 int has_error = 0;
 int result = evaluate(&expr, &has_error);
 
 sheet[row][col].has_error = has_error;
-
 if (!has_error)
-{
     sheet[row][col].value = result;
-}
 
 strcpy(sheet[row][col].formula, input);
 
+// recalculate dependents
+recalculate_dependents(row, col);
 
 print_sheet();
 return 0;
