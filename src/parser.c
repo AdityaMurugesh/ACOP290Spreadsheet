@@ -9,10 +9,11 @@
 
 int parse_value(char *input, int i, Value *val)
 {
-    if (isdigit(input[i]))
+    if (isdigit(input[i]) || (input[i] == '-' && isdigit(input[i + 1])))
     {
         val->is_cell = 0;
         val->constant = atoi(&input[i]);
+        if (input[i] == '-') i++; // skip the minus sign
         while (isdigit(input[i]))
         {
             i++;
