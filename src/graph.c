@@ -5,21 +5,21 @@
 #include "evaluator.h"
 
 CellGraphNode **graph;
-
+// allocates graph same dimensions as sheet
 void init_graph(int rows, int cols) {
     graph = malloc(rows * sizeof(CellGraphNode *));  
     for (int i = 0; i < rows; i++) {
         graph[i] = malloc(cols * sizeof(CellGraphNode)); 
         for (int j = 0; j < cols; j++) {
-            graph[i][j].dependents = NULL;
+            graph[i][j].dependents = NULL; //every cell starts with no dependencies
             graph[i][j].expr = NULL;
             graph[i][j].has_formula = 0;
         }
     }
 }
-
+// deletes the dependency of the matching to node from the given source cell
 void remove_from_dependents(int from_row, int from_col, int to_row, int to_col) {
-    DependencyNode **current = &graph[from_row][from_col].dependents;
+    DependencyNode **current = &graph[from_row][from_col].dependents; 
     while (*current != NULL) {
         if ((*current)->row == to_row && (*current)->col == to_col) {
             DependencyNode *temp = *current;
@@ -31,6 +31,7 @@ void remove_from_dependents(int from_row, int from_col, int to_row, int to_col) 
     }
 }
 
+// whenn cell gets new formula, removes all the previous dependencies
 void clear_dependency_graph(int row, int col) {
     if (!graph[row][col].has_formula || graph[row][col].expr == NULL)
         return;
@@ -49,6 +50,7 @@ void clear_dependency_graph(int row, int col) {
         if (expr->right.is_cell)
             remove_from_dependents(expr->right.row, expr->right.col, row, col);
     }
+    //function not sleep
     else if (expr->type == func && expr->func != slp) {
         for (int r = expr->range_start_row; r <= expr->range_end_row; r++) {
             for (int c = expr->range_start_col; c <= expr->range_end_col; c++) {
@@ -60,7 +62,7 @@ void clear_dependency_graph(int row, int col) {
         if (expr->left.is_cell)
             remove_from_dependents(expr->left.row, expr->left.col, row, col);
     }
-
+    // resets to null
     free(graph[row][col].expr);
     graph[row][col].expr = NULL;
     graph[row][col].has_formula = 0;
@@ -68,12 +70,13 @@ void clear_dependency_graph(int row, int col) {
 
 void add_dependency(int from_row, int from_col, int to_row, int to_col) {
     DependencyNode *node = malloc(sizeof(DependencyNode));
-    node->row = to_row;
+    node->row = to_row; //new linked list
     node->col = to_col;
     node->next = graph[from_row][from_col].dependents;
     graph[from_row][from_col].dependents = node;
 }
-
+ // checks for cycles
+ // recursive dfs, if reaches the same cell again, it is a cyclic graph returns 1
 int dfs_cycle(int start_row, int start_col, int row, int col, int **visited) {
     DependencyNode *dep = graph[row][col].dependents;
     while (dep != NULL) {
@@ -88,7 +91,7 @@ int dfs_cycle(int start_row, int start_col, int row, int col, int **visited) {
     }
     return 0;
 }
-
+//runs dfs to check if there is a cycle in the graph starting from the given cell
 int has_circular_dependency(int row, int col) {
     int **visited = malloc(num_rows * sizeof(int *));
     for (int i = 0; i < num_rows; i++) {
@@ -104,7 +107,8 @@ int has_circular_dependency(int row, int col) {
 
     return result;
 }
-
+//recursively recalculates all the dependent cells of the given cell
+//if any of them has formula, evaluates it
 void recalculate_dependents(int row, int col) {
     DependencyNode *dep = graph[row][col].dependents;
     while (dep != NULL) {
@@ -117,7 +121,7 @@ void recalculate_dependents(int row, int col) {
 
             sheet[r][c].has_error = has_error;
             if (!has_error)
-                sheet[r][c].value = result;
+                sheet[r][c].value = result; //update value of the cell
 
             recalculate_dependents(r, c);
         }
