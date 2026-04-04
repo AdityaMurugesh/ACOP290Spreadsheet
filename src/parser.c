@@ -317,7 +317,6 @@ strcpy(sheet[row][col].formula, input);
 // recalculate dependents
 recalculate_dependents(row, col);
 
-print_sheet();
 return 0;
 
 }

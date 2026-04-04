@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "parser.h"
 #include "sheet.h"
 #include "display.h"
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
     char input[256]; //keeps running till user types q
     char *status = "ok";
     double elapsed=0.0; //time taken to execute the command
+    int output_enabled = 1; //output is enabled by default
 
     while (1)
     {
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
         {
             view_row -= 10;
             if (view_row < 0) view_row = 0; //prevents going above top row
-            print_sheet();
+            if (output_enabled) print_sheet();
 
         }
 
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
         {
             view_row += 10;
             if (view_row > num_rows) view_row = num_rows - 1; //prevents from scrolling too far down
-            print_sheet();
+            if (output_enabled) print_sheet();
 
         }
 
@@ -74,30 +76,67 @@ int main(int argc, char *argv[])
         {
             view_col -= 10;
             if (view_col < 0) view_col = 0; //prevents going left of column A
-            print_sheet();
+            if (output_enabled) print_sheet();
 
         }
 
         else if (strcmp(input, "d") == 0)
         {
             view_col += 10;
-            if (view_col > num_cols) view_col = num_cols - 1; //prevents going right of last column
-            print_sheet();
+            if (view_col > num_cols) view_col = num_cols - 1;
+            if (output_enabled) print_sheet();
+        }
 
+        else if (strcmp(input, "disable_output") == 0)
+        {
+            output_enabled = 0;
+        }
+
+        else if (strcmp(input, "enable_output") == 0)
+        {
+            output_enabled = 1;
+        }
+
+        else if (strncmp(input, "scroll_to ", 10) == 0)
+        {
+            char *cell = input + 10; // skips past the first 10 characters
+            int ci = 0; //to extract column and row from the input
+            char col_str[4];
+            int col_len = 0;
+            while (isalpha(cell[ci])) {
+                col_str[col_len++] = cell[ci++];
+            }
+            col_str[col_len] = '\0';
+            char row_str[5];
+            int row_len = 0;
+            while (isdigit(cell[ci])) {
+                row_str[row_len++] = cell[ci++];
+            }
+            row_str[row_len] = '\0';
+
+            if (col_len > 0 && row_len > 0) { //valid input
+                view_col = col_name_to_index(col_str);
+                view_row = row_name_to_index(row_str);
+            }
+            if (output_enabled) print_sheet();
         }
 
         else
         {
             int result = parse_input(input);
-            if (result == 1)
+            if (result == 0)
+            {
+                if (output_enabled) print_sheet();
+            }
+            else if (result == 1)
             {
                 status = "unrecognized cmd";
-                print_sheet();
+                if (output_enabled) print_sheet();
             }
             else if (result == 2)
             {
                 status = "circular dependency";
-                print_sheet();
+                if (output_enabled) print_sheet();
             }
         }
 
