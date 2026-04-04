@@ -6,6 +6,7 @@
 #include "display.h"
 #include "evaluator.h"
 #include "graph.h"
+#include <sys/time.h>
 
 int main(int argc, char *argv[])
 {
@@ -31,10 +32,11 @@ int main(int argc, char *argv[])
 
     char input[256]; //keeps running till user types q
     char *status = "ok";
+    double elapsed=0.0; //time taken to execute the command
 
     while (1)
     {
-        printf("[0.0] (%s) > ", status);
+        printf("[%.1f] (%s) > ", elapsed, status);
         fflush(stdout);
         status = "ok";
 
@@ -44,6 +46,8 @@ int main(int argc, char *argv[])
         }
 
         input[strcspn(input, "\n")] = 0; //removes /n character
+        struct timeval tv_start, tv_end; //start time after input is read
+        gettimeofday(&tv_start, NULL);
 
         if (strcmp(input, "q") == 0)
         {
@@ -97,6 +101,8 @@ int main(int argc, char *argv[])
             }
         }
 
+        gettimeofday(&tv_end, NULL); //end time after command finished, includes recalculation time for dependent cells
+        elapsed = (tv_end.tv_sec - tv_start.tv_sec) + (tv_end.tv_usec - tv_start.tv_usec) / 1000000.0;
 
     }
 
