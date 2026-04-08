@@ -41,6 +41,8 @@ int parse_value(char *input, int i, Value *val)
 
         val->col = col_name_to_index(col_str);
         val->row = row_name_to_index(row_str);
+        if (val->row < 0 || val->row >= num_rows || val->col < 0 || val->col >= num_cols)
+            return -1;
         return i;
     }
     return -1;
@@ -312,6 +314,8 @@ int result = evaluate(&expr, &has_error);
 sheet[row][col].has_error = has_error;
 if (!has_error)
     sheet[row][col].value = result;
+else
+    sheet[row][col].value = 0;
 
 strcpy(sheet[row][col].formula, input);
 

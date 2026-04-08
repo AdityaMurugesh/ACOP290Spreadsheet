@@ -16,6 +16,20 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // validate arguments are purely numeric
+    for (int k = 0; argv[1][k] != '\0'; k++) {
+        if (!isdigit(argv[1][k])) {
+            printf("Error: invalid arguments. Usage: ./sheet R C\n");
+            return 1;
+        }
+    }
+    for (int k = 0; argv[2][k] != '\0'; k++) {
+        if (!isdigit(argv[2][k])) {
+            printf("Error: invalid arguments. Usage: ./sheet R C\n");
+            return 1;
+        }
+    }
+
     int rows = atoi(argv[1]);
     int cols = atoi(argv[2]);
 
