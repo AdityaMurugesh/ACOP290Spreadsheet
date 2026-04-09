@@ -66,6 +66,10 @@ int evaluate(Expression *expr, int *has_error)
         {
             int secs = get_value(&expr->left, has_error);
             if (*has_error) return 0;
+            if (secs < 0) {
+                *has_error = 1;
+                return 0;
+            }
             sleep(secs);
             return secs;
 

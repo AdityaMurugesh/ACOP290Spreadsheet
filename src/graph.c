@@ -121,7 +121,9 @@ void recalculate_dependents(int row, int col) {
 
             sheet[r][c].has_error = has_error;
             if (!has_error)
-                sheet[r][c].value = result; //update value of the cell
+                sheet[r][c].value = result;
+            else
+                sheet[r][c].value = 0;
 
             recalculate_dependents(r, c);
         }
