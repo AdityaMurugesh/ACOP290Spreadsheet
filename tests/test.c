@@ -73,7 +73,7 @@ output = run_sheet(2, 2, "A1=3\\nB1=7\\nA2=SUM(A1:B1)\\nq");
 assert_contains("SUM function", output, "10");
 
 output = run_sheet(2, 2, "A1=MAX(B1:A1)\\nq");
-assert_contains("invalid range", output, "Invalid");
+assert_contains("invalid range", output, "invalid range");
 
 output = run_sheet(3, 3, "A1=5\\nB1=2\\nC1=8\\nA2=MIN(A1:C1)\\nq");
 assert_contains("MIN function", output, "2");
