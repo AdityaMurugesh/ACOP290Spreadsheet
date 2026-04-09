@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
             }
             else if (result == 3)
             {
-                status = "invalid range";
+                status = "Invalid range";
                 if (output_enabled) print_sheet();
             }
         }
