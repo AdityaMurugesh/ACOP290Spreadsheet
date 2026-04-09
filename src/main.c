@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
             row_str[row_len] = '\0';
 
             if (col_len > 0 && row_len > 0) { //valid input
-                new_row = row_name_to_index(row_str);
-                new_col = col_name_to_index(col_str);
+                int new_row = row_name_to_index(row_str);
+                int new_col = col_name_to_index(col_str);
 
                 if (new_row > 0 && new_row < num_rows && new_col > 0 && new_col < num_cols) {
                     view_row = new_row;
