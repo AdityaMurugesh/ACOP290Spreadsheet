@@ -33,11 +33,13 @@ void remove_from_dependents(int from_row, int from_col, int to_row, int to_col) 
 
 // whenn cell gets new formula, removes all the previous dependencies
 void clear_dependency_graph(int row, int col) {
-    if (!graph[row][col].has_formula || graph[row][col].expr == NULL)
+    if (graph[row][col].expr == NULL)
         return;
 
     Expression *expr = graph[row][col].expr;
 
+    // only remove dependency edges if cell had a formula (not a plain constant)
+    if (graph[row][col].has_formula) {
     if (expr->type == cell) {
         // was depending on one cell
         remove_from_dependents(expr->left.row, expr->left.col, row, col);
@@ -62,7 +64,8 @@ void clear_dependency_graph(int row, int col) {
         if (expr->left.is_cell)
             remove_from_dependents(expr->left.row, expr->left.col, row, col);
     }
-    // resets to null
+    } // end has_formula check
+    // always free the old expression
     free(graph[row][col].expr);
     graph[row][col].expr = NULL;
     graph[row][col].has_formula = 0;
