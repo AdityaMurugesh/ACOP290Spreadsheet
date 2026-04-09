@@ -67,7 +67,7 @@ int evaluate(Expression *expr, int *has_error)
             int secs = get_value(&expr->left, has_error);
             if (*has_error) return 0;
             sleep(secs);
-            return secs;
+            return 0;
 
         }
 
@@ -79,7 +79,6 @@ int evaluate(Expression *expr, int *has_error)
 
         if (start_row > end_row || start_col > end_col) 
         {
-            printf("(Invalid Range)\n");
             *has_error = 1; //invalid range error
             return 0;
         }
@@ -92,9 +91,7 @@ int evaluate(Expression *expr, int *has_error)
 
         double mean = 0;
 
-        int r;
         for (int r = start_row; r <= end_row; r++) {
-            int c;
             for (int c = start_col; c <= end_col; c++) {
                 if (sheet[r][c].has_error) 
                 {
@@ -106,7 +103,7 @@ int evaluate(Expression *expr, int *has_error)
                 if (cell_val < min_val) min_val = cell_val;
                 if (cell_val > max_val) max_val = cell_val;
             }
-    }
+        }
 
     mean = (double)sum_val / count;
 
@@ -130,6 +127,6 @@ int evaluate(Expression *expr, int *has_error)
 
     }
 
-    *has_error = 1; //should never reach here, but just in case
+    *has_error = 1; 
     return 0;
 }

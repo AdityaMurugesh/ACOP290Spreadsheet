@@ -295,17 +295,17 @@ if (expr.type == cell) {
         add_dependency(expr.left.row, expr.left.col, row, col);
 }
 
-// check for circular dependency
-if (has_circular_dependency(row, col)) {
-    clear_dependency_graph(row, col);
-    return 2;  // circular dependency error
-}
-
 // store expression in graph
 Expression *stored_expr = malloc(sizeof(Expression));
 *stored_expr = expr;
 graph[row][col].expr = stored_expr;
 graph[row][col].has_formula = (expr.type != constant) ? 1 : 0;
+
+// check for circular dependency
+if (has_circular_dependency(row, col)) {
+    clear_dependency_graph(row, col);  
+    return 2;  // circular dependency error
+}
 
 // evaluate expression
 int has_error = 0;
