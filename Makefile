@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Isrc/include -lm
+CFLAGS = -std=c99 -Isrc/include -lm
+
 
 SRCS = src/main.c src/sheet.c src/parser.c src/evaluator.c src/display.c src/graph.c
 
