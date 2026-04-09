@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         else if (strcmp(input, "s") == 0)
         {
             view_row += 10;
-            if (view_row > num_rows) view_row = num_rows - 1; //prevents from scrolling too far down
+            if (view_row >= num_rows) view_row = num_rows - 1; //prevents from scrolling too far down
             if (output_enabled) print_sheet();
 
         }
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         else if (strcmp(input, "d") == 0)
         {
             view_col += 10;
-            if (view_col > num_cols) view_col = num_cols - 1;
+            if (view_col >= num_cols) view_col = num_cols - 1;
             if (output_enabled) print_sheet();
         }
 
