@@ -9,7 +9,7 @@ void print_sheet()
     int col_end = view_col + VIEW_COLS;
     if (col_end > num_cols) col_end = num_cols;
 
-    printf("   "); // leaving a gap for row numbers
+    printf("    "); // leaving a gap for row numbers (matches %3d + space)
     for (int j = view_col; j < col_end; j++) {
         char col_name[10];
         index_to_col_name(j, col_name);

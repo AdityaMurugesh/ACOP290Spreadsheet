@@ -152,6 +152,7 @@ if (input[i]=='('){
     if (expr.func ==slp){
         Value sleep_val;
         i = parse_value(input, i, &sleep_val);
+        if (i == -1) return 1;
         expr.left = sleep_val;
     }
     else{
