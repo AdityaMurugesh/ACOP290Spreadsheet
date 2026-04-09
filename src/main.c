@@ -131,6 +131,11 @@ int main(int argc, char *argv[])
             if (col_len > 0 && row_len > 0) { //valid input
                 view_col = col_name_to_index(col_str);
                 view_row = row_name_to_index(row_str);
+
+                if (new_row > 0 && new_row < num_rows && new_col > 0 && new_col < num_cols) {
+                    view_row = new_row;
+                    view_col = new_col;
+                } else {status = 'unrecognized cmd';}
             }
             if (output_enabled) print_sheet();
         }
@@ -150,6 +155,11 @@ int main(int argc, char *argv[])
             else if (result == 2)
             {
                 status = "circular dependency";
+                if (output_enabled) print_sheet();
+            }
+            else if (result == 3)
+            {
+                status = "invalid range";
                 if (output_enabled) print_sheet();
             }
         }

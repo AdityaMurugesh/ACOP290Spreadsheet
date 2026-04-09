@@ -203,6 +203,11 @@ if (input[i]=='('){
         expr.range_end_col = col_name_to_index(end_col_name);
         expr.range_end_row = row_name_to_index(end_row_name);
 
+        if (expr.range_start_row > expr.range_end_row || expr.range_start_col > expr.range_end_col)
+        {
+            return 3; // invalid range error
+        }
+
     }
     if (input[i] != ')')
     {
