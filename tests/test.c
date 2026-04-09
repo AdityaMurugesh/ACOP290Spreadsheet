@@ -53,7 +53,6 @@ int main() {
 output = run_sheet(2, 2, "A1=2\\nq");
 assert_contains("set constant A1=2", output, "2     0");
 
-
 output = run_sheet(2, 2, "A1=5\\nB1=A1\\nq");
 assert_contains("cell reference B1=A1", output, "5     5");
 
@@ -74,6 +73,45 @@ assert_contains("SUM function", output, "10");
 
 output = run_sheet(2, 2, "A1=MAX(B1:A1)\\nq");
 assert_contains("invalid range", output, "Invalid");
+
+output = run_sheet(3, 3, "A1=5\\nB1=2\\nC1=8\\nA2=MIN(A1:C1)\\nq");
+assert_contains("MIN function", output, "2");
+
+output = run_sheet(3, 3, "A1=5\\nB1=2\\nC1=8\\nA2=MAX(A1:C1)\\nq");
+assert_contains("MAX function", output, "8");
+
+output = run_sheet(2, 2, "A1=2\\nB1=4\\nA2=AVG(A1:B1)\\nq");
+assert_contains("AVG function", output, "3");
+
+output = run_sheet(2, 2, "A1=2\\nB1=4\\nA2=STDEV(A1:B1)\\nq");
+assert_contains("STDEV function", output, "1");
+
+output = run_sheet(2, 2, "A1=SLEEP(1)\\nq");
+assert_contains("SLEEP returns value", output, "1");
+
+output = run_sheet(2, 2, "A1=A1+1\\nq");
+assert_contains("circular dependency", output, "circular dependency");
+
+output = run_sheet(2, 2, "A1=1\\nB1=1/A1\\nC1=B1+1\\nA1=0\\nq");
+assert_contains("ERR propagation", output, "ERR");
+
+output = run_sheet(2, 2, "A3=5\\nq");
+assert_contains("out of bounds", output, "unrecognized cmd");
+
+output = run_sheet(2, 2, "disable_output\\nA1=5\\nq");
+assert_not_contains("disable output hides grid", output, "5");
+
+output = run_sheet(3, 3, "A1=1\\nB1=A1+1\\nC1=B1+1\\nA1=5\\nq");
+assert_contains("chained recalculation", output, "7");
+
+output = run_sheet(2, 2, "A1=5/2\\nq");
+assert_contains("integer division truncation", output, "2");
+
+output = run_sheet(2, 2, "scroll_to Z999\\nq");
+assert_contains("scroll_to out of bounds", output, "unrecognized cmd");
+
+output = run_sheet(3, 3, "A1=1\\nB1=2\\nA2=3\\nB2=4\\nC1=SUM(A1:B2)\\nq");
+assert_contains("2D SUM range", output, "10");
 
 
     printf("\n%d passed, %d failed\n", passed, failed);
