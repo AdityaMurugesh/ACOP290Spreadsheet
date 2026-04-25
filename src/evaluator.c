@@ -66,6 +66,10 @@ int evaluate(Expression *expr, int *has_error)
         {
             int secs = get_value(&expr->left, has_error);
             if (*has_error) return 0;
+            if (secs < 0) {
+                *has_error = 1;
+                return 0;
+            }
             sleep(secs);
             return secs;
 
@@ -85,19 +89,23 @@ int evaluate(Expression *expr, int *has_error)
 
         int count = (end_row - start_row + 1) * (end_col - start_col + 1);
 
+        // check for errors in range first
+        for (int r = start_row; r <= end_row; r++) {
+            for (int c = start_col; c <= end_col; c++) {
+                if (sheet[r][c].has_error) {
+                    *has_error = 1;
+                    return 0;
+                }
+            }
+        }
+
         int sum_val = 0;
         int min_val = sheet[start_row][start_col].value;
         int max_val = sheet[start_row][start_col].value;
-
         double mean = 0;
 
         for (int r = start_row; r <= end_row; r++) {
             for (int c = start_col; c <= end_col; c++) {
-                if (sheet[r][c].has_error) 
-                {
-                    *has_error = 1; //error in range
-                    return 0;
-                }
                 int cell_val = sheet[r][c].value;
                 sum_val += cell_val;
                 if (cell_val < min_val) min_val = cell_val;

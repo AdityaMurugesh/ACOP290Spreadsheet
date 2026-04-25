@@ -152,6 +152,7 @@ if (input[i]=='('){
     if (expr.func ==slp){
         Value sleep_val;
         i = parse_value(input, i, &sleep_val);
+        if (i == -1) return 1;
         expr.left = sleep_val;
     }
     else{
@@ -176,7 +177,11 @@ if (input[i]=='('){
 
         expr.range_start_col = col_name_to_index(start_col_name);
         expr.range_start_row = row_name_to_index(start_row_name);
-        
+
+        if (expr.range_start_row < 0 || expr.range_start_row >= num_rows ||
+            expr.range_start_col < 0 || expr.range_start_col >= num_cols)
+            return 1;
+
         if (input[i] != ':')
         {
             return 1;
@@ -202,6 +207,10 @@ if (input[i]=='('){
         end_row_name[end_row_len] = '\0';
         expr.range_end_col = col_name_to_index(end_col_name);
         expr.range_end_row = row_name_to_index(end_row_name);
+
+        if (expr.range_end_row < 0 || expr.range_end_row >= num_rows ||
+            expr.range_end_col < 0 || expr.range_end_col >= num_cols)
+            return 1;
 
         if (expr.range_start_row > expr.range_end_row || expr.range_start_col > expr.range_end_col)
         {
@@ -278,10 +287,7 @@ if (row < 0 || row >= num_rows || col < 0 || col >= num_cols)
     return 1;
 }
 
-// clear old dependencies
-clear_dependency_graph(row, col);
-
-// add new dependencies
+// add new dependencies (temporarily, before clearing old ones)
 if (expr.type == cell) {
     add_dependency(expr.left.row, expr.left.col, row, col);
 } else if (expr.type == arithmetic) {
@@ -300,17 +306,37 @@ if (expr.type == cell) {
         add_dependency(expr.left.row, expr.left.col, row, col);
 }
 
+// check for circular dependency before committing
+if (has_circular_dependency(row, col)) {
+    // undo the new dependencies we just added
+    if (expr.type == cell) {
+        remove_from_dependents(expr.left.row, expr.left.col, row, col);
+    } else if (expr.type == arithmetic) {
+        if (expr.left.is_cell)
+            remove_from_dependents(expr.left.row, expr.left.col, row, col);
+        if (expr.right.is_cell)
+            remove_from_dependents(expr.right.row, expr.right.col, row, col);
+    } else if (expr.type == func && expr.func != slp) {
+        for (int r = expr.range_start_row; r <= expr.range_end_row; r++) {
+            for (int c = expr.range_start_col; c <= expr.range_end_col; c++) {
+                remove_from_dependents(r, c, row, col);
+            }
+        }
+    } else if (expr.type == func && expr.func == slp) {
+        if (expr.left.is_cell)
+            remove_from_dependents(expr.left.row, expr.left.col, row, col);
+    }
+    return 2;  // circular dependency error
+}
+
+// new formula passed all checks — now safe to clear old dependencies
+clear_dependency_graph(row, col);
+
 // store expression in graph
 Expression *stored_expr = malloc(sizeof(Expression));
 *stored_expr = expr;
 graph[row][col].expr = stored_expr;
 graph[row][col].has_formula = (expr.type != constant) ? 1 : 0;
-
-// check for circular dependency
-if (has_circular_dependency(row, col)) {
-    clear_dependency_graph(row, col);  
-    return 2;  // circular dependency error
-}
 
 // evaluate expression
 int has_error = 0;
