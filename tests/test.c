@@ -93,7 +93,7 @@ assert_contains("SLEEP returns value", output, "1");
 output = run_sheet(2, 2, "A1=A1+1\\nq");
 assert_contains("circular dependency", output, "circular dependency");
 
-output = run_sheet(2, 2, "A1=1\\nB1=1/A1\\nC1=B1+1\\nA1=0\\nq");
+output = run_sheet(3, 3, "A1=1\\nB1=1/A1\\nC1=B1+1\\nA1=0\\nq");
 assert_contains("ERR propagation", output, "ERR");
 
 output = run_sheet(2, 2, "A3=5\\nq");
