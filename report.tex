@@ -9,6 +9,7 @@
 
 \title{ACOP290 C Lab: Spreadsheet Program \\ \large Design Report}
 \author{
+    % PUT YOUR NAMES AND ENTRY NUMBERS HERE
     Tanvi Parsam (24A1CSEB0022) \and Aditya Murugesh (24A1CSEB0002)
 }
 \date{\today}
@@ -90,6 +91,8 @@ main.c & REPL loop, input routing, timing & \texttt{main} \\
 \end{tabular}
 \end{table}
 
+\newpage
+
 % ============================================================
 \section{Design Decisions}
 % ============================================================
@@ -120,32 +123,32 @@ main.c & REPL loop, input routing, timing & \texttt{main} \\
     \item \textbf{Memory leak with constant assignments.} Constants are stored with \texttt{has\_formula=0}. The original \texttt{clear\_dependency\_graph} checked this flag first and returned early, skipping the \texttt{free()} call for the stored expression. Repeated constant assignments (e.g., \texttt{A1=1}, \texttt{A1=2}, \texttt{A1=3}) would leak one \texttt{Expression} each time. We fixed this by separating the ``free the expression'' step from the ``remove dependency edges'' step: the expression is always freed, but edges are only removed if the cell had a formula.
 \end{enumerate}
 
+\newpage
+
 % ============================================================
 \section{Edge Cases and Test Coverage}
 % ============================================================
 
-Our test suite contains 59 automated tests that verify correct behavior across the following categories:
-
+Our test file contains 20 automated tests that verify correct behavior across the following categories:
 \begin{table}[h]
 \centering
 \begin{tabular}{@{}lp{8cm}@{}}
 \toprule
 \textbf{Category} & \textbf{Test Cases} \\
 \midrule
-Basic operations & Set constant (\texttt{A1=2}), cell reference (\texttt{B1=A1}), arithmetic (\texttt{A1+3}), integer division truncation (\texttt{5/2=2}), multiplication, subtraction to zero, negative constants and results \\
-Functions & MIN, MAX, AVG, SUM, STDEV with ranges; SLEEP returns its argument value; SLEEP(0); SLEEP with negative value returns ERR \\
-Ranges & 1D range (\texttt{A1:C1}), 2D range (\texttt{A1:B2}), single-cell range, invalid range where start $>$ end, out-of-bounds range \\
-Error handling & Division by zero produces ERR; ERR propagates through dependent cells; ERR in range makes function ERR; ERR recovery after source is corrected \\
-Dependencies & Single recalculation (\texttt{B1=A1+1}, change A1); chained recalculation across 3 cells; multiple cells depending on the same source; overwrite formula with constant removes dependency \\
-Circular deps & Self-reference (\texttt{A1=A1+1}); two-cell and three-cell cycles; circular via range; recovery after rejection; old formula preserved after circular rejection \\
-Boundary checks & Out-of-bounds target cell (\texttt{A3=5} on 2$\times$2 sheet); out-of-bounds cell reference in formula; invalid program arguments (\texttt{./sheet 0 0}) \\
-Helper commands & Unrecognized command shows error; \texttt{disable\_output} suppresses sheet display; \texttt{enable\_output} restores display; \texttt{scroll\_to} with valid and out-of-bounds cells; scroll at boundaries (w/a at top-left) \\
-Input handling & Empty formula (\texttt{A1=}); spaces-only input; formula with spaces (\texttt{A1 = 2 + 3}) \\
+Basic operations & Set constant (\texttt{A1=2}), cell reference (\texttt{B1=A1}), arithmetic (\texttt{A1+3}), integer division truncation (\texttt{5/2=2}) \\
+Functions & MIN, MAX, AVG, SUM, STDEV with ranges; SLEEP returns its argument value \\
+Ranges & 1D range (\texttt{A1:C1}), 2D range (\texttt{A1:B2}), invalid range where start $>$ end \\
+Error handling & Division by zero produces ERR; ERR propagates through dependent cells \\
+Dependencies & Single recalculation (\texttt{B1=A1+1}, change A1); chained recalculation across 3 cells \\
+Circular deps & Self-reference (\texttt{A1=A1+1}) \\
+Boundary checks & Out-of-bounds target cell (\texttt{A3=5} on 2$\times$2 sheet) \\
+Helper commands & Unrecognized command shows error; \texttt{disable\_output} suppresses sheet display; \texttt{scroll\_to} with out-of-bounds cell \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent Tests are run with \texttt{make test}, which compiles \texttt{tests/test.c} and executes it. Each test launches \texttt{./sheet} with piped input and checks the output for expected strings.
+\noindent Tests are run with \texttt{make test}, which compiles \texttt{tests/test.c} and executes it. Each test launches \texttt{./sheet} with the necessary input and checks the output for expected strings.
 
 % ============================================================
 \section{Links}
